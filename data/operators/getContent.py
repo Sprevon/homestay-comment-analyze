@@ -39,11 +39,18 @@ class ExcelOperator:
         except Exception  as e:
             raise ValueError("Error loading single context from workbook:", e)
 
+    def get_num_rows(self):
+        try:
+            value = self.workbook.shape[0]
+            return value
+        except Exception as e:
+            raise ValueError("Error loading num_rows from workbook:", e)
 
-current_directory = os.path.dirname(os.path.abspath(__file__))
 
-# Navigate to the "excel" folder and access "comments.xlsx"
-file_path = os.path.join(current_directory, '..', 'excel', 'comments.xlsx')
 
-excel_operator = ExcelOperator(file_path)
-print(excel_operator.load_context_in_columns(4))
+# current_directory = os.path.dirname(os.path.abspath(__file__))
+# file_path = os.path.join(current_directory, '..', 'excel', 'commentsL.xlsx')
+# excel_operator = ExcelOperator(file_path)
+# print(excel_operator.load_context_in_columns(4))
+# print("\n", excel_operator.load_context_by_one(1, 4))
+# print(excel_operator.get_num_rows())
