@@ -4,13 +4,12 @@ from data.operators.getContent import ExcelOperator
 
 """
 对外开放API接口
-
 """
 
 
 def load_file():
     current_directory = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(current_directory, 'excel', 'commentsLH.xlsx')
+    file_path = os.path.join(current_directory, 'excel', 'comments.xlsx')
     excel_operator = ExcelOperator(file_path)
     return excel_operator
 

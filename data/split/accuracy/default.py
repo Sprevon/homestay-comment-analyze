@@ -1,3 +1,4 @@
+import emoji
 import jieba
 import string
 
@@ -5,6 +6,8 @@ from data.stopword.stopWord import load_stop_words
 
 
 def split_by_default(content):
+    # 去emoji
+    content = emoji.replace_emoji(content, "")
     # 去除标点
     translator = str.maketrans('', '', string.punctuation + "\n 。 ， 、 ； ： ？！ “” ‘’ … "
                                + "的 了 很 也 非常 在 还 来 是 接 小姐姐 到 "
@@ -29,4 +32,4 @@ def split_by_default(content):
     return list(seg_list)
 
 
-# print(split_by_default("我来,到北京清华大学"))
+# print(split_by_default("我来,到北京清华大学😍😍😍"))
