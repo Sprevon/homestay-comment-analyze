@@ -1,10 +1,14 @@
+import multiprocessing
 import time
 import warnings
+from multiprocessing import Pool
 
 from gensim import corpora
 
 from data.local_data_API import get_plain_text_column4, get_single_text_in_column4, get_num_rows
+from data.local_data_API_new import LoadData
 from data.split.accuracy.default import split_by_default
+from multicore.precess.processor import worker_function
 
 warnings.filterwarnings('ignore')
 from gensim.models.ldamodel import LdaModel
@@ -16,16 +20,34 @@ NLTK库：https://www.nltk.org/index.html
 """
 
 
-def compute(start, end):
+def compute_mul(start, end):
     start_time = time.time()
     # 创建数据集
-    content = get_plain_text_column4()
+    load_data = LoadData()
     data_set = []
-    for i in range(start, end):
-        seg_list = get_single_text_in_column4(i)
-        spl_list = split_by_default(seg_list)  # 分词 + 去标点
-        data_set.append(spl_list)
+    # 参数初始化
+    num_processes = 3
+    step = (end - start) // num_processes
+    processes = []
+    result_queue = multiprocessing.Queue()
 
+    for i in range(num_processes):
+        process_start = start + i * step
+        process_end = process_start + step if i < num_processes - 1 else end
+        process = multiprocessing.Process(target=worker_function,
+                                          args=(load_data, process_start, process_end, result_queue))
+        processes.append(process)
+        process.start()
+
+    for process in processes:
+        process.join()
+
+    result_data = []
+    while not result_queue.empty():
+        result_data.extend(result_queue.get())
+    print("All processed completed.")
+
+    data_set = result_data
     # print(data_set)
 
     dictionary = corpora.Dictionary(data_set)  # 构建词典
@@ -51,7 +73,4 @@ def compute(start, end):
 
     end_time = time.time()
     elapse_time = end_time - start_time
-    print("time:", elapse_time)
-
-
-compute(0, 20)
+    print("time-mult:", elapse_time)
