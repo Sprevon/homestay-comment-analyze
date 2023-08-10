@@ -4,11 +4,12 @@ import warnings
 from multiprocessing import Pool
 
 from gensim import corpora
+from gensim.models import EnsembleLda
 
 from data.local_data_API import get_plain_text_column4, get_single_text_in_column4, get_num_rows
 from data.local_data_API_new import LoadData
 from data.split.accuracy.default import split_by_default
-from multicore.precess.processor import worker_function
+from multicore.precess.processor import worker_function, worker_function_2
 
 warnings.filterwarnings('ignore')
 from gensim.models.ldamodel import LdaModel
@@ -20,35 +21,25 @@ NLTK库：https://www.nltk.org/index.html
 """
 
 
-def compute_mul(start, end):
+def compute_mul_2(start, end):
     start_time = time.time()
     # 创建数据集
-    load_data = LoadData()
-    data_set = []
+    print("Load Data")
+    all_data = LoadData().content.load_context_in_columns(4)  # 返回一个pandas Series
+    data = all_data[start:end]
+    data_time = time.time()
     # 参数初始化
-    num_processes = 3
-    step = (end - start) // num_processes
-    processes = []
-    result_queue = multiprocessing.Queue()
-
-    for i in range(num_processes):
-        process_start = start + i * step
-        process_end = process_start + step if i < num_processes - 1 else end
-        process = multiprocessing.Process(target=worker_function,
-                                          args=(load_data, process_start, process_end, result_queue))
-        processes.append(process)
-        process.start()
-        print("process ", i, " started")
-
-    for process in processes:
-        process.join()
-        print("joined")
+    num_processes = 12
+    print("Initialize")
+    with Pool(processes=num_processes) as pool:
+        print("Pooling started")
+        processed_results = pool.map(worker_function_2, data)
 
     print("All processed completed.")
+    process_time = time.time()
 
-    result_data = []
-    while not result_queue.empty():
-        result_data.extend(result_queue.get())
+    result_data = processed_results
+
     print("Get result")
     data_set = result_data
     # print(data_set)
@@ -56,9 +47,13 @@ def compute_mul(start, end):
     dictionary = corpora.Dictionary(data_set)  # 构建词典
     corpus = [dictionary.doc2bow(text) for text in data_set]  # 表示为第几个单词出现了几次
     print("Get dictionary")
+    dictionary_time = time.time()
+
     # 构建模型
-    lda = LdaModel(corpus=corpus, id2word=dictionary, num_topics=5, passes=20, random_state=1)
-    print("Get model")
+    lda = LdaModel(corpus=corpus, id2word=dictionary, num_topics=5, passes=20, random_state=2)
+    # lda = EnsembleLda(corpus=corpus, id2word=dictionary, num_topics=5, passes=20, topic_model_class=LdaModel, 
+    # ensemble_workers=4, num_models=8, distance_workers=4)
+    print("Get models")
     topic_list = lda.print_topics()
     print(topic_list[0])
     print(topic_list[1])
@@ -77,4 +72,16 @@ def compute_mul(start, end):
 
     end_time = time.time()
     elapse_time = end_time - start_time
-    print("time-mult:", elapse_time)
+    print()
+    print("------------------------------------")
+    print("load time:", data_time - start_time)
+    print("process time: ", (process_time - data_time))
+    print("dictionary time: ", (dictionary_time - process_time))
+    print("model time:", (end_time - dictionary_time))
+    print("------------------------------------")
+    print("total time:", elapse_time)
+    print("------------------------------------")
+
+
+if __name__ == "__main__":
+    compute_mul_2(0, 10000)

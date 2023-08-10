@@ -1,4 +1,7 @@
 import os
+import time
+
+import pandas
 
 from data.operators.getContent import ExcelOperator
 
@@ -39,6 +42,31 @@ class LoadData:
         excel_operator = self.content
         return excel_operator.get_num_rows()
 
-# print(get_single_text_in_column4(3))
-# print(get_plain_text_column4())
-# print(get_num_rows())
+
+if __name__ == '__main__':
+    # print(get_single_text_in_column4(3))
+    # print(get_plain_text_column4())
+    # print(get_num_rows())
+    def test1():
+        s = time.time()
+        load = LoadData()
+        e = time.time()
+        c = e - s
+        print("time: ", c)
+
+        s1 = time.time()
+        file_content = load.get_single_text_in_column4(2)
+        print(load.get_single_text_in_column4(5))
+        e1 = time.time()
+        c1 = e1 - s1
+        print("time1: ", c1)
+
+    def test2():
+        load_data = LoadData().content.load_context_in_columns(4)  # 返回一个object
+        print(load_data)
+        for item in load_data:
+            print(type(item))
+        # data = pandas.Series(["text1", "text2", "text3"])
+        # print(data)
+    test2()
+
