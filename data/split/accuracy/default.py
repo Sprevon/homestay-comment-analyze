@@ -20,6 +20,10 @@ def split_by_default(content):
                                # "民宿 给 便 真 空调 说 里 你 里面 性 "
                                  "特别 喜欢 推荐 满意 找 再 哦 票 楼 近 选择"
                                  "早餐 订 高 买 淡淡 啊 但 聊 联系 点"
+                                 "说 这 要 感觉 你 能"
+                                 "差  吃 着 吧 么 只 着 着 娘 把"
+                                 "知道 后 得 又 她 因为"
+                                 "超级 里 离 而且 前台"
                                )
     stop_words = load_stop_words()
     for word in stop_words:

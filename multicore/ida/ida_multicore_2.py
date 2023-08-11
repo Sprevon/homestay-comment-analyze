@@ -50,7 +50,7 @@ def compute_mul_2(start, end):
     dictionary_time = time.time()
 
     # 构建模型
-    lda = LdaMulticore(corpus=corpus, id2word=dictionary, num_topics=6 , passes=200, random_state=2, workers=None)
+    lda = LdaMulticore(corpus=corpus, id2word=dictionary, num_topics=6, passes=20, random_state=2, workers=None)
     # lda = EnsembleLda(corpus=corpus, id2word=dictionary, num_topics=5, passes=20, topic_model_class=LdaModel, 
     # ensemble_workers=4, num_models=8, distance_workers=4)
     print("Get models")
