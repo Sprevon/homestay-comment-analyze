@@ -4,7 +4,7 @@ import warnings
 from multiprocessing import Pool
 
 from gensim import corpora
-from gensim.models import EnsembleLda
+from gensim.models import EnsembleLda, LdaMulticore
 
 from data.local_data_API import get_plain_text_column4, get_single_text_in_column4, get_num_rows
 from data.local_data_API_new import LoadData
@@ -50,7 +50,7 @@ def compute_mul_2(start, end):
     dictionary_time = time.time()
 
     # 构建模型
-    lda = LdaModel(corpus=corpus, id2word=dictionary, num_topics=5, passes=20, random_state=2)
+    lda = LdaMulticore(corpus=corpus, id2word=dictionary, num_topics=6 , passes=200, random_state=2, workers=None)
     # lda = EnsembleLda(corpus=corpus, id2word=dictionary, num_topics=5, passes=20, topic_model_class=LdaModel, 
     # ensemble_workers=4, num_models=8, distance_workers=4)
     print("Get models")
@@ -61,14 +61,14 @@ def compute_mul_2(start, end):
     print(topic_list[3])
     print(topic_list[4])
 
-    # 输出主题概率分布
-    result_list = []
-    for i in lda.get_document_topics(corpus)[:]:
-        listj = []
-        for j in i:
-            listj.append(j[1])
-        bz = listj.index(max(listj))
-        result_list.append(i[bz][0])
+    # # 输出主题概率分布
+    # result_list = []
+    # for i in lda.get_document_topics(corpus)[:]:
+    #     listj = []
+    #     for j in i:
+    #         listj.append(j[1])
+    #     bz = listj.index(max(listj))
+    #     result_list.append(i[bz][0])
 
     end_time = time.time()
     elapse_time = end_time - start_time
